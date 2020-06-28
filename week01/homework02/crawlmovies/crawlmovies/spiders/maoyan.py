@@ -17,7 +17,7 @@ class MaoyanSpider(scrapy.Spider):
     form_data = {
     'ck':'',
     'name':'18642827832',
-    'password':'Spring2014!',
+    'password':'',
     'remember':'false',
     'ticket':''
     }
@@ -42,38 +42,40 @@ class MaoyanSpider(scrapy.Spider):
         #header = {'cookies':str(cookies),'user-agent':ua.random}
 
         return [scrapy.Request(url=url, callback=self.parse, headers=self.header, dont_filter=False)]
-        #return [scrapy.Request(url=url, callback=self.parse, dont_filter=False)]
-
+        
     def parse(self, response):
-            # 打印网页的url
+        #url
         b_url = 'http://maoyan.com'
         print('response.url:',response.url)
         ind = 0
 
-        #定位电影位置
+        #movie position 
         movies = Selector(text=response.text, type="html").xpath('//div[@class="movie-item-hover"]')
         for movie in movies:
             title = movie.xpath('./a//div[@class="movie-hover-title"][1]/span[@class="name "]/text()')
             link = movie.xpath('./a/@href')
             item = CrawlercateyesItem()
-            item['moviename'] = title.extract()
-            '''
+            print(len(title.extract()))
+
+            #covered movie with score and noscore
             if len(title.extract()) >= 1:
                 item['moviename'] = title.extract()[0]
             else:
                 titlenoscore = movie.xpath('./a//div[@class="movie-hover-title"][1]/span[@class="name noscore"]/text()')
-                item['moviename'] = titlenoscore.extract()
-            '''
+                item['moviename'] = titlenoscore.extract()[0]
+            
+
             item['movielink'] = link.extract()[0]
             
             ind = ind + 1
+            #for 10 movies
             if ind <=10:
                 yield scrapy.Request(url=b_url+str(link.extract()[0]), meta={'item': item}, callback=self.parse2, headers=self.header)
                 #yield scrapy.Request(url=b_url+str(link.extract()[0]), meta={'item': item}, callback=self.parse2)
             else:
                 break
 
-        # 解析具体页面
+        #enter into detail of the movie
     def parse2(self, response):
         item = response.meta['item']
         #print(response.text)
@@ -90,8 +92,9 @@ class MaoyanSpider(scrapy.Spider):
             #get release date
             releasedate = moviedetail.xpath('./li[3]/text()').extract()[0]
         
-        #print(movietypes)
+        
         print(releasedate)
+        #combine the elements of the list of movie type
         item['movietype'] = ''.join(types)
         item['releasedate'] = releasedate
         print('init:',item)
