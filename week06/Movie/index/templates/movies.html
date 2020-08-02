@@ -1,0 +1,14 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MovieList</title>
+</head>
+<body>
+
+{% for movies in movieslist %}
+    <div>moviename: {{ movies.movies_name }}   <br>
+         moviecomments: {{ movies.movies_comments }} <br>
+         moviestars:  {{ movies.movies_stars }}  
+    </div>
+{% endfor %}
+</body>
