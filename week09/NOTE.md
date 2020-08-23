@@ -5,7 +5,7 @@
     >>>from django.contrib.auto.models import User 
     >>>user = User.objects.create_usser('stone','stone@gmail.com','stone2020')
 '''
-###celery定时任务的实现
+### 定时任务的实现
 '''
     1.Redis
 
